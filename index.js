@@ -115,6 +115,7 @@ io.on('connection', socket => {
         console.log('A player disconnected');
         players.splice(players.indexOf(socket), 1);
         _turn--;
+        io.emit('serverToClientShortList', players);
         console.log("A number of players now ", players.length);
     });
 
