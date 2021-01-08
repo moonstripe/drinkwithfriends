@@ -2,9 +2,10 @@ import React, {useEffect, useState} from 'react';
 import { useSelector } from 'react-redux';
 import {PlayingCard} from "./Card";
 import io from 'socket.io-client';
-import {Container, Grid, List, ListItem, ListItemText, Snackbar} from '@material-ui/core';
+import {Container, Grid, List, ListItem, ListItemText, Snackbar, Card} from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import {makeStyles} from '@material-ui/core/styles';
+
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -14,6 +15,7 @@ function Alert(props) {
 const socket = io();
 
 const Table = () => {
+
     const gender = useSelector(state => state.viewer.gender);
 
     const [currentCard, setCurrentCard] = useState({});
@@ -196,57 +198,63 @@ const Table = () => {
 
     return (
         <div>
-            <Container maxWidth="xl">
-                <Grid>
-                    <Grid item xs={3}>
-                    <p> {playerNickname} drew a {rule}</p>
-                        <List component="nav" aria-label="contacts">
-                            {playerArr?.map(player => {
-                                    if (player.socketId === sock) {
-                                        return (
-                                            <ListItem
-                                                style={{backgroundColor: "rgba(187,72,72,0.49)"}}>
-                                                <ListItemText primary={player.nickname}/>
-                                            </ListItem>
-                                        )
-                                    } else {
-                                        return (
-                                            <ListItem
-                                                style={{backgroundColor: 'white'}}>
-                                                <ListItemText primary={player.nickname}/>
-                                                {
-                                                    isSelecting && isTurn ? <button onClick={
-                                                            (e) => {
-                                                                setTargetPlayer(player.socketId);
-                                                                setIsSelecting(false);
-                                                                socket.emit('clientToServerPlayerTargeted', player.socketId);
-                                                                console.log(player.socketId);
-                                                            }
-                                                        }> Send Drink</button> :
-                                                        <button disabled >Send Drink</button>
-                                                }
-                                            </ListItem>
-                                        )
-                                    }
+            <Grid container maxWidth="xl">
+                <Grid xs={2}>
+                    {/*DRINKFEED START*/}
+                    <List component="nav" aria-label="contacts">
+                        {playerArr?.map(player => {
+                                if (player.socketId === sock) {
+                                    return (
+                                        <ListItem
+                                            style={{backgroundColor: "rgba(187,72,72,0.49)"}}>
+                                            <ListItemText primary={player.nickname}/>
+                                        </ListItem>
+                                    )
+                                } else {
+                                    return (
+                                        <ListItem
+                                            style={{backgroundColor: 'white'}}>
+                                            <ListItemText primary={player.nickname}/>
+                                            {
+                                                isSelecting && isTurn ? <button onClick={
+                                                        (e) => {
+                                                            setTargetPlayer(player.socketId);
+                                                            setIsSelecting(false);
+                                                            socket.emit('clientToServerPlayerTargeted', player.socketId);
+                                                            console.log(player.socketId);
+                                                        }
+                                                    }> Send Drink</button> :
+                                                    <button disabled >Send Drink</button>
+                                            }
+                                        </ListItem>
+                                    )
                                 }
-                            )
                             }
+                        )
+                        }
 
-                        </List>
-                        <div>
-                            <Snackbar open={isDrink} autoHideDuration={1000}>
-                                <Alert onClose={handleClose} severity="warning">
-                                    Drink!
-                                </Alert>
-                            </Snackbar>
-                        </div>
-                    </Grid>
-                    {isTurn ?
-                        <PlayingCard suit={currentCard.suit} num={currentCard.visVal} image={currentCard.image}/>
-                        : null}
-
+                    </List>
                 </Grid>
-            </Container>
+                <Grid xs={6}>
+                    <Grid xs={12}>
+
+                        {isTurn ?
+                            <PlayingCard suit={currentCard.suit} num={currentCard.visVal} image="/cards/red_back.png"/>
+                            :
+                            <PlayingCard suit={currentCard.suit} num={currentCard.visVal} image={currentCard.image}/>}
+                    </Grid>
+
+                    <Grid xs={12}>
+                        {isTurn ?
+                            <PlayingCard suit={currentCard.suit} num={currentCard.visVal} image={currentCard.image}/>
+                            :
+                            <PlayingCard suit={currentCard.suit} num={currentCard.visVal} image="/cards/red_back.png"/>}
+                    </Grid>
+                </Grid>
+                <Grid xs={4}>
+                    chat
+                </Grid>
+            </Grid>
         </div>
     );
 }

@@ -7,7 +7,6 @@ const {playingCards} = require('./services/deck.js');
 const routes = require('./routes');
 
 
-require('./services/passport');
 mongoose.connect(process.env.MONGODB_URI, {
     // tells mongodb to use the new versions of mongo, otherwise an update might break the code
     useNewUrlParser: true,
