@@ -1,6 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 import {PlayingCard} from "./Card";
+import {GameSpace} from './GameSpace';
+import {DrinkFeed} from './DrinkFeed';
+import {ChatBox} from './ChatBox';
+
 import io from 'socket.io-client';
 import {Container, Grid, List, ListItem, ListItemText, Snackbar, Card} from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -38,7 +42,11 @@ const Table = () => {
             setNumTurn(turnNum);
         });
 
-        socket.on('serverToClientSocketId', (socketId) =>{
+        socket.on('serverToClientShortList', (players) => {
+            setPlayerArr(players);
+        })
+
+        socket.on('serverToClientSocketId', (socketId) => {
             setSock(socketId);
         });
 
@@ -68,15 +76,14 @@ const Table = () => {
 
         // logic for switch case rules
         socket.on('serverToClientDrink', () => {
-           setIsDrink(true);
+            setIsDrink(true);
         })
 
 
         return function () {
-            console.log('Im leaving');
-            socket.removeListener('serverToClientUpdateInfo');
-            socket.removeListener('your_turn');
-            socket.removeListener('not_your_turn');
+            socket.off('serverToClientUpdateInfo');
+            socket.off('your_turn');
+            socket.off('not_your_turn');
             // socket.removeListener('not_your_turn');
         }
     }, []);
@@ -91,7 +98,7 @@ const Table = () => {
 
 
             case 2:
-            // pick someone to drink
+                // pick someone to drink
                 setIsSelecting(true);
                 break;
             case 3:
@@ -104,7 +111,7 @@ const Table = () => {
                 break;
 
             case 4:
-            // *hit down key
+                // *hit down key
                 console.log(turn);
                 if (turn) {
                     socket.emit('clientToServerRandom');
@@ -124,7 +131,7 @@ const Table = () => {
                 }
                 break;
             case 7:
-            // *hit up key
+                // *hit up key
                 console.log(turn);
                 if (turn) {
                     socket.emit('clientToServerRandom');
@@ -140,7 +147,7 @@ const Table = () => {
                 break;
 
             case 9:
-            // *hit left key
+                // *hit left key
                 console.log(turn);
                 if (turn) {
                     socket.emit('clientToServerRandom');
@@ -153,7 +160,7 @@ const Table = () => {
                 break;
 
             case 11:
-            // *hit right key
+                // *hit right key
                 console.log(turn);
                 if (turn) {
                     socket.emit('clientToServerRandom');
@@ -166,7 +173,7 @@ const Table = () => {
                 break;
 
             case 13:
-            // *lowest amount of drinks
+                // *lowest amount of drinks
                 console.log(turn);
                 if (turn) {
                     socket.emit('clientToServerRandom');
@@ -177,82 +184,36 @@ const Table = () => {
         // socket.emit('ruleToServer', card.visVal);
     }
 
-    const renderClickableList = () => {
-        console.log();
-    }
-
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setIsDrink(false);
-    };
-
-
-    const renderSwitch = (card) => {
-        console.log(card.visVal);
-
-    }
+    //  Drink SnackBar
+    // const handleClose = (event, reason) => {
+    //     if (reason === 'clickaway') {
+    //         return;
+    //     }
+    //
+    //     setIsDrink(false);
+    // };
 
 
     return (
         <div>
             <Grid container maxWidth="xl">
                 <Grid xs={2}>
-                    {/*DRINKFEED START*/}
-                    <List component="nav" aria-label="contacts">
-                        {playerArr?.map(player => {
-                                if (player.socketId === sock) {
-                                    return (
-                                        <ListItem
-                                            style={{backgroundColor: "rgba(187,72,72,0.49)"}}>
-                                            <ListItemText primary={player.nickname}/>
-                                        </ListItem>
-                                    )
-                                } else {
-                                    return (
-                                        <ListItem
-                                            style={{backgroundColor: 'white'}}>
-                                            <ListItemText primary={player.nickname}/>
-                                            {
-                                                isSelecting && isTurn ? <button onClick={
-                                                        (e) => {
-                                                            setTargetPlayer(player.socketId);
-                                                            setIsSelecting(false);
-                                                            socket.emit('clientToServerPlayerTargeted', player.socketId);
-                                                            console.log(player.socketId);
-                                                        }
-                                                    }> Send Drink</button> :
-                                                    <button disabled >Send Drink</button>
-                                            }
-                                        </ListItem>
-                                    )
-                                }
-                            }
-                        )
-                        }
-
-                    </List>
+                    <DrinkFeed
+                        playerArr={playerArr}
+                        isSelecting={isSelecting}
+                        isTurn={isTurn}
+                        sock={sock}
+                        targetPlayer={targetPlayer}
+                    />
                 </Grid>
                 <Grid xs={6}>
-                    <Grid xs={12}>
-
-                        {isTurn ?
-                            <PlayingCard suit={currentCard.suit} num={currentCard.visVal} image="/cards/red_back.png"/>
-                            :
-                            <PlayingCard suit={currentCard.suit} num={currentCard.visVal} image={currentCard.image}/>}
-                    </Grid>
-
-                    <Grid xs={12}>
-                        {isTurn ?
-                            <PlayingCard suit={currentCard.suit} num={currentCard.visVal} image={currentCard.image}/>
-                            :
-                            <PlayingCard suit={currentCard.suit} num={currentCard.visVal} image="/cards/red_back.png"/>}
-                    </Grid>
+                    <GameSpace
+                        currentCard={currentCard}
+                        isTurn={isTurn}
+                    />
                 </Grid>
                 <Grid xs={4}>
-                    chat
+                    <ChatBox/>
                 </Grid>
             </Grid>
         </div>
