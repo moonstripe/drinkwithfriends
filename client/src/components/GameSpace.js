@@ -6,7 +6,10 @@ export const GameSpace = (props) => {
     return (
         <Grid container>
         <Grid xs={12}>
-            <p>other card</p>
+
+            {
+                props.currentPlayer != '' ? <p>Player {props.currentPlayer} pulled a {props.currentCard.visVal} of {props.currentCard.suit}</p> : null
+            }
 
             {props.isTurn ?
                 <PlayingCard suit={props.currentCard.suit} num={props.currentCard.visVal} image="/cards/red_back.png"/>
