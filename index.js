@@ -48,7 +48,7 @@ function next_turn(){
             console.log(players[_turn]);
             let nonPlayers = players.filter(player => player != players[_turn])
             for (let i = 0; i < nonPlayers.length; i++) {
-                io.to(nonPlayers[i].socketId).emit('not_your_turn', [_turn, card]);
+                io.to(nonPlayers[i].socketId).emit('not_your_turn', [players[_turn].socketId, card]);
             }
             io.to(players[_turn].socketId).emit('your_turn', card);
         }
@@ -113,7 +113,7 @@ io.on('connection', socket => {
 
     socket.on('disconnect', function () {
         console.log('A player disconnected');
-        players.splice(players.indexOf(socket), 1);
+        players = players.filter( el => el.socketId != socket.id);
         _turn--;
         io.emit('serverToClientShortList', players);
         console.log("A number of players now ", players.length);

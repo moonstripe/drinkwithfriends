@@ -9,10 +9,7 @@ const socket = io();
 export const DrinkFeed = (props) => {
 
     const [arr, setArr] = useState(props.playerArr);
-    // const [isSelecting, setIsSelecting] = useState(props.isSelecting);
-    // const [isTurn, setIsTurn] = useState(props.isTurn);
-    // const [targetPlayer, setTargetPlayer] = useState(props.targetPlayer)
-    const [socket, setSocket] = useState(props.sock);
+
 
     useEffect(() => {
         setArr(props.playerArr);
@@ -34,7 +31,7 @@ export const DrinkFeed = (props) => {
                         } else {
                             return (
                                 <ListItem
-                                    style={{backgroundColor: 'white'}}>
+                                    style={props.currentPlayer === player.socketId ? {backgroundColor: 'green'} : {backgroundColor: 'white'}}>
                                     <ListItemText primary={player.nickname}/>
                                     <ListItemIcon><LocalDrinkIcon/></ListItemIcon>
                                     {/*{*/}

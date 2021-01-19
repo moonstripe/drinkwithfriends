@@ -31,7 +31,7 @@ const Table = () => {
     const [playerArr, setPlayerArr] = useState([]);
     const [sock, setSock] = useState('');
     const playerNickname = localStorage.getItem('nickname') || 'kojin';
-    const [numTurn, setNumTurn] = useState(0);
+    const [currentPlayer, setCurrentPlayer] = useState('');
     useEffect(() => {
         // socket welcome: adds player to array
         socket.emit('clientToServerWelcome', playerNickname);
@@ -39,7 +39,6 @@ const Table = () => {
         socket.on('serverToClientUpdateInfo', ([players, turnNum, socketId]) => {
             console.log(players, socketId);
             setPlayerArr(players);
-            setNumTurn(turnNum);
         });
 
         socket.on('serverToClientShortList', (players) => {
@@ -52,7 +51,7 @@ const Table = () => {
 
 
         // connection to see whose turn it is
-        socket.on('not_your_turn', ([_turn, card]) => {
+        socket.on('not_your_turn', ([player, card]) => {
             console.log('other player drew:', card);
             setCurrentCard(card);
             setIsSelecting(false)
@@ -60,6 +59,7 @@ const Table = () => {
             setIsTurn(false);
             setRule(card.visVal);
             iDrink(card.visVal, false);
+            setCurrentPlayer(player);
         })
 
         // connection to wait for turn
@@ -72,6 +72,7 @@ const Table = () => {
             setCurrentCard(msg);
             setRule(msg.visVal);
             iDrink(msg.visVal, true);
+            setCurrentPlayer('');
         })
 
         // logic for switch case rules
@@ -82,6 +83,7 @@ const Table = () => {
 
         return function () {
             socket.off('serverToClientUpdateInfo');
+            socket.off('serverToClientShortList')
             socket.off('your_turn');
             socket.off('not_your_turn');
             // socket.removeListener('not_your_turn');
@@ -200,14 +202,14 @@ const Table = () => {
                 <Grid xs={2}>
                     <DrinkFeed
                         playerArr={playerArr}
-                        isSelecting={isSelecting}
-                        isTurn={isTurn}
                         sock={sock}
                         targetPlayer={targetPlayer}
+                        currentPlayer={currentPlayer}
                     />
                 </Grid>
                 <Grid xs={6}>
                     <GameSpace
+                        currentPlayer={currentPlayer}
                         currentCard={currentCard}
                         isTurn={isTurn}
                     />

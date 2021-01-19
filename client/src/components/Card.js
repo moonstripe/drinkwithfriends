@@ -20,7 +20,7 @@ const useStyles = makeStyles({
 export const PlayingCard = (props) => {
 
 
-    console.log(props.suit, props.num, props.image)
+    // console.log(props.suit, props.num, props.image)
 
     const classes = useStyles();
 
