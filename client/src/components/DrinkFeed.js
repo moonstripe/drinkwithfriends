@@ -7,7 +7,7 @@ import io from 'socket.io-client';
 const socket = io();
 
 export const DrinkFeed = (props) => {
-
+    console.log(props.currentPlayer);
     const [arr, setArr] = useState(props.playerArr);
 
 
@@ -16,7 +16,7 @@ export const DrinkFeed = (props) => {
     }, [props.playerArr])
 
     const renderDrinkFeed = () => {
-        console.log(arr);
+
         return (
             <List component="nav" aria-label="contacts">
 
@@ -31,7 +31,7 @@ export const DrinkFeed = (props) => {
                         } else {
                             return (
                                 <ListItem
-                                    style={props.currentPlayer === player.socketId ? {backgroundColor: 'green'} : {backgroundColor: 'white'}}>
+                                    style={props.currentPlayer.socket === player.socketId ? {backgroundColor: 'green'} : {backgroundColor: 'white'}}>
                                     <ListItemText primary={player.nickname}/>
                                     <ListItemIcon><LocalDrinkIcon/></ListItemIcon>
                                     {/*{*/}

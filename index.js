@@ -48,7 +48,7 @@ function next_turn(){
             console.log(players[_turn]);
             let nonPlayers = players.filter(player => player != players[_turn])
             for (let i = 0; i < nonPlayers.length; i++) {
-                io.to(nonPlayers[i].socketId).emit('not_your_turn', [players[_turn].socketId, card]);
+                io.to(nonPlayers[i].socketId).emit('not_your_turn', [players[_turn].nickname, players[_turn].socketId, card]);
             }
             io.to(players[_turn].socketId).emit('your_turn', card);
         }
@@ -72,6 +72,7 @@ function triggerTimeout(){
 // }
 
 io.on('connection', socket => {
+
     let newPlayer;
     let _turn = 0;
     let card;
