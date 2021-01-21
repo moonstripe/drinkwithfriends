@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 import {PlayingCard} from "./Card";
 import {GameSpace} from './GameSpace';
 import {DrinkFeed} from './DrinkFeed';
@@ -19,8 +19,12 @@ function Alert(props) {
 const socket = io();
 
 const Table = () => {
+    //
+    // const gender = useSelector(state => state.viewer.gender);
 
-    const gender = useSelector(state => state.viewer.gender);
+    const { nickname } = useSelector(state => state.player)
+
+    console.log(nickname);
 
     const [currentCard, setCurrentCard] = useState({});
     const [isTurn, setIsTurn] = useState(false);
@@ -30,11 +34,13 @@ const Table = () => {
     const [targetPlayer, setTargetPlayer] = useState('');
     const [playerArr, setPlayerArr] = useState([]);
     const [sock, setSock] = useState('');
-    const playerNickname = localStorage.getItem('nickname') || 'kojin';
-    const [currentPlayer, setCurrentPlayer] = useState('');
+    const [currentPlayer, setCurrentPlayer] = useState({
+        nickname: nickname.nickname,
+        socket: '',
+    });
     useEffect(() => {
         // socket welcome: adds player to array
-        socket.emit('clientToServerWelcome', playerNickname);
+        socket.emit('clientToServerWelcome', nickname.nickname);
         // updates players on client
         socket.on('serverToClientUpdateInfo', ([players, turnNum, socketId]) => {
             console.log(players, socketId);
@@ -51,7 +57,7 @@ const Table = () => {
 
 
         // connection to see whose turn it is
-        socket.on('not_your_turn', ([player, card]) => {
+        socket.on('not_your_turn', ([player, socketId, card]) => {
             console.log('other player drew:', card);
             setCurrentCard(card);
             setIsSelecting(false)
@@ -59,7 +65,7 @@ const Table = () => {
             setIsTurn(false);
             setRule(card.visVal);
             iDrink(card.visVal, false);
-            setCurrentPlayer(player);
+            setCurrentPlayer({nickname: player, socket: socketId});
         })
 
         // connection to wait for turn
@@ -72,7 +78,7 @@ const Table = () => {
             setCurrentCard(msg);
             setRule(msg.visVal);
             iDrink(msg.visVal, true);
-            setCurrentPlayer('');
+            setCurrentPlayer({nickname: '', socket: ''});
         })
 
         // logic for switch case rules
@@ -121,14 +127,14 @@ const Table = () => {
                 break;
             case 5:
                 // guys
-                if (gender === 0) {
+                if (false) {
                     setIsDrink(true);
                 }
                 break;
 
             case 6:
                 // chicks
-                if (gender === 1) {
+                if (false) {
                     setIsDrink(true);
                 }
                 break;

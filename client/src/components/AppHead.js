@@ -6,8 +6,8 @@ import Button from '@material-ui/core/Button';
 import banner from '../images/banner.png';
 import '../style/App.css';
 import { useSelector, useDispatch } from 'react-redux';
-import { setViewerToken, setViewerNickname, setViewerGender } from '../pages/Viewer';
 import { Link, useHistory } from 'react-router-dom';
+import { getNickname } from './PlayerReducer';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -99,7 +99,6 @@ const SignUpButton = withStyles({
 
 export default function ButtonAppBar() {
   const classes = useStyles();
-  const { token } = useSelector(state => state.viewer);
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -107,9 +106,6 @@ export default function ButtonAppBar() {
     localStorage.removeItem('token');
     localStorage.removeItem('nickname');
     localStorage.removeItem('gender');
-    dispatch(setViewerToken(null));
-    dispatch(setViewerNickname(null));
-    dispatch(setViewerGender(null));
     history.push('/');
   };
   return (
@@ -117,55 +113,7 @@ export default function ButtonAppBar() {
       <AppBar position="static">
 
         <Toolbar>
-
-          {
-            token ?
-              <Button
-                color='inherit'
-                onClick={handleSignOut}
-              >
-                Sign Out
-              </Button> :
-              <div style={{
-                marginLeft: '100px'
-              }}>
-                <SignUpButton
-                  to='/signup'
-                  component={Link}
-                  color="inherit">
-                  Sign Up
-                </SignUpButton>
-
-
-              </div>
-          }
-
-          <img src={banner} style={{
-            float: 'none',
-            width: '270px',
-            marginLeft: 'auto',
-            marginRight: 'auto'
-          }} alt="kings quets banner" width="250px" display height="70px" margin-left="30%"></img>
-          <div style={{
-            marginLeft: '100px',
-            marginRight: '50px'
-          }}>
-            {
-              token ?
-                <Button
-                  to='/game'
-                  component={Link}
-                  color="inherit">
-                  Join Game
-                  </Button> :
-                <SignInButton
-                  to='/signin'
-                  component={Link}
-                  color="inherit">
-                  Sign In
-                </SignInButton>
-            }
-          </div>
+          <button onClick={() => dispatch(getNickname('moon'))}>set nickname to moon</button>
         </Toolbar>
       </AppBar>
     </div>
