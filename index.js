@@ -77,6 +77,13 @@ io.on('connection', socket => {
     let _turn = 0;
     let card;
 
+    // Socket ChatBox code begins here
+    socket.on('chat message', ({name, message}) => {
+        io.emit('chat message', {name, message});
+      });
+
+      // Socket ChatBox code ends here
+
     socket.on('clientToServerWelcome', (playerNickname) => {
         // console.log(playerNickname);
         // console.log(socket.id);
