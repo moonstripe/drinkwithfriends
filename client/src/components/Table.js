@@ -6,7 +6,7 @@ import {DrinkFeed} from './DrinkFeed';
 import {ChatBox} from './ChatBox';
 
 import io from 'socket.io-client';
-import {Container, Grid, List, ListItem, ListItemText, Snackbar, Card} from '@material-ui/core';
+import {Container, TextField, Grid, List, ListItem, ListItemText, Snackbar, Card} from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import {makeStyles} from '@material-ui/core/styles';
 
@@ -24,7 +24,34 @@ const Table = () => {
 
     const { nickname } = useSelector(state => state.player)
 
-    console.log(nickname);
+    // console.log("NICKNAME", nickname);
+
+    // chatBox states
+    const [msg, setMsg] = useState({message: "", name: nickname.nickname});
+    const [chat, setChat] = useState([]);
+
+    // chatBox functions
+    const renderChat = () => {
+        console.log("CHAT", chat[0].message);
+        return chat.map(({name, message}, index) =>(
+            <div key={index}>
+                <h3>
+                    {name}: {message}
+                </h3>
+            </div>
+        ))
+    }
+    const onTextChange = e => {
+        setMsg({ ...msg, [e.target.name]: e.target.value })
+    }
+    const onMessageSubmit = (e) => {
+        e.preventDefault()
+        const {message, name} = msg
+        const arr = [...chat, msg];
+        console.log("CHAT", arr);
+        socket.emit('clientToServerNewChat', arr)
+        setMsg({ message: "", name })
+    }
 
     const [currentCard, setCurrentCard] = useState({});
     const [isTurn, setIsTurn] = useState(false);
@@ -39,6 +66,14 @@ const Table = () => {
         socket: '',
     });
     useEffect(() => {
+
+        // chatBox changes start 
+        socket.on('serverToClientChat', (chatArray) => {
+            setChat([...chatArray]);
+        })
+        // chatBox changes end
+
+
         // socket welcome: adds player to array
         socket.emit('clientToServerWelcome', nickname.nickname);
         // updates players on client
@@ -221,7 +256,37 @@ const Table = () => {
                     />
                 </Grid>
                 <Grid xs={4}>
-                    <ChatBox/>
+                    <form onSubmit={onMessageSubmit}>
+                        {/* <h1>Messenger</h1>
+                        <div className="name-field">
+                            <TextField 
+                            name="name" 
+                            onChange={e => onTextChange(e)} 
+                            value={message.name}
+                            label="Name"
+                            />
+                        </div> */}
+                        <div>
+                            <TextField 
+                            name="message" 
+                            onChange={e => onTextChange(e)} 
+                            value={msg.message}
+                            id="outlined=multiline-static"
+                            variant="outlined"
+                            label="Message"
+                            />
+                        </div>
+                        <button>Send Message</button>
+                    </form>
+                    <div className="render-chat">
+                        <h1>Chat Log</h1>
+                        {chat.length > 0 ? renderChat() : null}
+                    </div>
+                    {/* <ChatBox
+                        currentPlayer={currentPlayer}
+                        // look at drink feed
+                        // keep track of an array of messages in backend
+                    /> */}
                 </Grid>
             </Grid>
         </div>

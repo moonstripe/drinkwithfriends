@@ -77,6 +77,14 @@ io.on('connection', socket => {
     let _turn = 0;
     let card;
 
+    // Socket ChatBox code begins here
+    socket.on('clientToServerNewChat', (chatArray) => {
+        io.emit('serverToClientChat', chatArray );
+        console.log("CHAT ARRAY", chatArray);
+      });
+
+      // Socket ChatBox code ends here
+
     socket.on('clientToServerWelcome', (playerNickname) => {
         // console.log(playerNickname);
         // console.log(socket.id);
