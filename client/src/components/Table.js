@@ -24,30 +24,33 @@ const Table = () => {
 
     const { nickname } = useSelector(state => state.player)
 
-    console.log(nickname);
+    // console.log("NICKNAME", nickname);
 
     // chatBox states
-    const [message, setMessage] = useState({message: "", name: ""});
+    const [msg, setMsg] = useState({message: "", name: nickname.nickname});
     const [chat, setChat] = useState([]);
 
     // chatBox functions
     const renderChat = () => {
-        return chat.map(({nickname, message}, index) =>(
+        console.log("CHAT", chat[0].message);
+        return chat.map(({name, message}, index) =>(
             <div key={index}>
                 <h3>
-                    {nickname}: <span>{message}</span>
+                    {name}: {message}
                 </h3>
             </div>
         ))
     }
     const onTextChange = e => {
-        setMessage({ ...message, [e.target.name]: e.target.value })
+        setMsg({ ...msg, [e.target.name]: e.target.value })
     }
     const onMessageSubmit = (e) => {
         e.preventDefault()
-        const {name, message} = message
-        socket.emit('chat message', { nickname, message })
-        setMessage({ message: "", nickname })
+        const {message, name} = msg
+        const arr = [...chat, msg];
+        console.log("CHAT", arr);
+        socket.emit('clientToServerNewChat', arr)
+        setMsg({ message: "", name })
     }
 
     const [currentCard, setCurrentCard] = useState({});
@@ -65,8 +68,8 @@ const Table = () => {
     useEffect(() => {
 
         // chatBox changes start 
-        socket.on('chat message', ({ name, message}) => {
-            setChat([...chat, { nickname, message }])
+        socket.on('serverToClientChat', (chatArray) => {
+            setChat([...chatArray]);
         })
         // chatBox changes end
 
@@ -267,7 +270,7 @@ const Table = () => {
                             <TextField 
                             name="message" 
                             onChange={e => onTextChange(e)} 
-                            value={message.message}
+                            value={msg.message}
                             id="outlined=multiline-static"
                             variant="outlined"
                             label="Message"
@@ -277,7 +280,7 @@ const Table = () => {
                     </form>
                     <div className="render-chat">
                         <h1>Chat Log</h1>
-                        {renderChat()}
+                        {chat.length > 0 ? renderChat() : null}
                     </div>
                     {/* <ChatBox
                         currentPlayer={currentPlayer}

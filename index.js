@@ -78,8 +78,9 @@ io.on('connection', socket => {
     let card;
 
     // Socket ChatBox code begins here
-    socket.on('chat message', ({name, message}) => {
-        io.emit('chat message', {name, message});
+    socket.on('clientToServerNewChat', (chatArray) => {
+        io.emit('serverToClientChat', chatArray );
+        console.log("CHAT ARRAY", chatArray);
       });
 
       // Socket ChatBox code ends here
